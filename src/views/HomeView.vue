@@ -157,6 +157,7 @@
               >Completed</v-btn
             >
           </v-badge>
+          <draggable>heyyy</draggable>
         </div>
         <p class="text-center mt-4 text-medium-emphasis">
           Drag and drop to reorder list
@@ -176,7 +177,7 @@ export default defineComponent({
     todos: [
       {
         title: "Complete online JavaScript course",
-        done: true,
+        done: false,
       },
       {
         title: "Jog around the park 3x",
@@ -233,12 +234,18 @@ export default defineComponent({
     },
   },
   methods: {
+    // save todo to local storage
+    saveToLocalStorage() {
+      localStorage.setItem("todos", JSON.stringify(this.todos));
+    },
+
     // create a todo
     createTodo() {
       this.todos.push({
         title: this.newToDo,
         done: false,
       });
+      this.saveToLocalStorage();
       this.newToDo = "";
       this.getTodos();
     },
@@ -246,18 +253,24 @@ export default defineComponent({
     mark(todo) {
       let ref = this.todos;
       this.todos[ref.indexOf(todo)].done = !this.todos[ref.indexOf(todo)].done;
+      localStorage.clear();
+      this.saveToLocalStorage();
       this.getTodos();
     },
     // remove a single done todo
     remove(todo) {
+      localStorage.clear();
       this.todos.splice(this.todos.indexOf(todo), 1);
+      this.saveToLocalStorage();
       this.getTodos();
     },
     // remove done todos
     clearComplete() {
+      localStorage.clear();
       this.done.forEach((todo) => {
         this.todos.splice(this.todos.indexOf(todo), 1);
       });
+      this.saveToLocalStorage();
       this.getTodos();
     },
     // get todos
@@ -276,12 +289,12 @@ export default defineComponent({
     draggable: VueDraggableNext,
   },
   mounted() {
-    // set current todos as all todos
+    const storedTodos = localStorage.getItem("todos");
+    this.todos = storedTodos ? JSON.parse(storedTodos) : this.todos;
     this.getTodos();
   },
 });
 </script>
-
 <style scoped>
 .container {
   margin: 0;
